@@ -1,0 +1,141 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Data directories
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/temp/*
+!data/temp/.gitkeep
+data/transcripts/*
+!data/transcripts/.gitkeep
+
+# Models (large files)
+models/whisper/*.pt
+!models/whisper/.gitkeep
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build
+frontend/dist
+
+# Dependencies
+frontend/node_modules/
+node_modules/
+
+# Production builds
+frontend/.next
+frontend/out
+
+# Misc
+*.tgz
+*.tar.gz
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Docker
+.dockerignore
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Audio/Video files (temporary downloads)
+*.mp4
+*.mp3
+*.wav
+*.webm
+*.m4a
+*.ogg
+*.flac
+!test_audio.wav
+!turkish_test.wav
+
+# Downloaded content
+downloads/
+temp_downloads/
+
+turkish_test.wav
+test_audio.wav

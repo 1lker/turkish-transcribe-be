@@ -1,0 +1,121 @@
+# Turkish Education Transcription System Configuration
+
+app:
+  name: "Turkish Edu Transcription"
+  version: "1.0.0"
+  debug: true
+  environment: "development"  # development, staging, production
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: true
+
+whisper:
+  model_size: "base"  # tiny, base, small, medium, large, large-v2, large-v3
+  device: "cuda"  # cuda, cpu
+  compute_type: "float16"  # float16, int8, float32
+  language: "tr"
+  initial_prompt: "Bu bir Türkçe eğitim videosu transkripsiyonudur."
+  temperature: 0.0
+  beam_size: 5
+  best_of: 5
+  patience: 1.0
+  length_penalty: 1.0
+  suppress_tokens: [-1]
+  condition_on_previous_text: true
+  compression_ratio_threshold: 2.4
+  logprob_threshold: -1.0
+  no_speech_threshold: 0.6
+
+audio:
+  sample_rate: 16000
+  channels: 1
+  chunk_length: 30  # seconds
+  overlap: 5  # seconds
+  format: "wav"
+  max_file_size: 5368709120  # 5GB in bytes
+  allowed_formats:
+    - mp4
+    - avi
+    - mov
+    - mkv
+    - webm
+    - mp3
+    - wav
+    - m4a
+
+processing:
+  batch_size: 4
+  max_concurrent_jobs: 2
+  timeout: 3600  # seconds
+  retry_count: 3
+  retry_delay: 5  # seconds
+
+storage:
+  base_path: "./data"
+  raw_videos_path: "./data/raw"
+  processed_path: "./data/processed"
+  transcripts_path: "./data/transcripts"
+  temp_path: "./data/temp"
+  
+database:
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "edu_transcription"
+    username: "postgres"
+    password: "postgres"
+    echo: false
+    pool_size: 10
+    max_overflow: 20
+    
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: null
+    decode_responses: true
+    
+  chromadb:
+    host: "localhost"
+    port: 8001
+    collection_name: "edu_transcripts"
+    embedding_function: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+  file:
+    enabled: true
+    path: "./logs"
+    rotation: "500 MB"
+    retention: "10 days"
+    compression: "zip"
+  console:
+    enabled: true
+    colorize: true
+    backtrace: true
+    diagnose: true
+
+monitoring:
+  metrics_enabled: true
+  metrics_port: 9090
+  health_check_enabled: true
+  health_check_path: "/health"
+
+features:
+  vad_enabled: true  # Voice Activity Detection
+  diarization_enabled: false  # Speaker diarization
+  enhancement_enabled: true  # Audio enhancement
+  auto_language_detection: false
+  
+limits:
+  max_upload_size: 5368709120  # 5GB
+  max_queue_size: 100
+  max_processing_time: 7200  # 2 hours
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+    requests_per_hour: 1000

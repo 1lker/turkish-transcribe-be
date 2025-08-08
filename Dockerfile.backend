@@ -1,0 +1,56 @@
+# Backend Dockerfile
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies for audio processing and youtube-dl
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install yt-dlp (more maintained than youtube-dl)
+RUN pip install yt-dlp
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Create necessary directories
+RUN mkdir -p /app/data/temp/youtube \
+    /app/data/raw \
+    /app/data/processed \
+    /app/data/transcripts \
+    /app/models/whisper \
+    /app/logs
+
+# Copy source code
+COPY src/ ./src/
+COPY configs/ ./configs/
+COPY models/ ./models/
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV WHISPER_CACHE_DIR=/app/models/whisper
+ENV DATA_DIR=/app/data
+ENV TEMP_DIR=/app/data/temp
+ENV YOUTUBE_DOWNLOAD_DIR=/app/data/temp/youtube
+
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Start command
+CMD ["python", "-m", "uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
