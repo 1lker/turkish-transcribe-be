@@ -1,215 +1,147 @@
-# Turkish Education Transcription System
+# Turkish Transcribe — Backend
 
-🎓 **AI-Powered Turkish Education Transcription System** - Powered by OpenAI Whisper
+> Production speech-to-text service for Turkish educational content. Whisper-powered, FastAPI-served, real-time.
 
-## 🌟 Features
-
-- **🇹🇷 Turkish Language Optimized**: Fine-tuned for Turkish educational content
-- **🎥 YouTube Integration**: Direct download and transcription from YouTube videos  
-- **⚡ Real-time Progress**: Live WebSocket updates during transcription
-- **🎯 Multiple Output Formats**: JSON, SRT (subtitles), and plain text
-- **🔧 Advanced Audio Processing**: VAD (Voice Activity Detection) and normalization
-- **🌐 Modern Web Interface**: React/Next.js frontend with real-time updates
-- **📊 Multiple Model Support**: Tiny, Base, Small, Medium, Large Whisper models
-- **⚙️ Flexible API**: RESTful API with comprehensive endpoints
-
-## 🏗️ Architecture
-
-### Backend (FastAPI)
-- **Audio Processing**: VAD, normalization, format conversion
-- **Transcription Engine**: OpenAI Whisper with Turkish optimization  
-- **WebSocket Support**: Real-time progress updates
-- **YouTube Integration**: yt-dlp for video/audio download
-- **File Management**: Upload, processing, and result storage
-
-### Frontend (Next.js 14)
-- **Modern UI**: Tailwind CSS with shadcn/ui components
-- **Real-time Updates**: WebSocket integration for live progress
-- **File Management**: Drag & drop upload with progress tracking
-- **Result Viewer**: Formatted transcription display with download options
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- ffmpeg
-
-### Backend Setup
-```bash
-# Clone and setup
-git clone <repo-url>
-cd turkish-edu-transcription
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or venv\Scripts\activate  # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start server
-uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### Frontend Setup
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## 📡 API Endpoints
-
-### Core Endpoints
-- `GET /health` - Health check
-- `POST /upload` - File upload
-- `POST /transcribe/{file_id}` - Start transcription
-- `GET /task/{task_id}` - Get transcription status
-- `WebSocket /ws/{task_id}` - Real-time updates
-
-### YouTube Integration
-- `GET /youtube/info?url=<url>` - Get video info
-- `POST /youtube/download` - Download video/audio
-- `WebSocket /youtube/download/{session_id}/ws` - Download progress
-
-## 🔧 Configuration
-
-Configuration is managed through `src/core/config.py`:
-
-```python
-# Model settings
-WHISPER_MODEL_SIZE = "base"  # tiny, base, small, medium, large
-DEVICE = "auto"  # auto, cpu, cuda
-
-# Processing settings
-BATCH_SIZE = 4
-APPLY_VAD = True
-NORMALIZE_AUDIO = True
-
-# Server settings
-HOST = "0.0.0.0"
-PORT = 8000
-```
-
-## 📁 Project Structure
-
-```
-turkish-edu-transcription/
-├── src/
-│   ├── api/           # FastAPI application
-│   ├── core/          # Configuration and utilities
-│   ├── transcription/ # Whisper engine and pipeline
-│   ├── ingestion/     # Data ingestion
-│   └── processing/    # Audio processing
-├── frontend/          # Next.js web interface
-├── data/              # Data storage
-│   ├── raw/          # Original audio files
-│   ├── processed/    # Processed audio files
-│   └── transcripts/  # Output transcriptions
-├── models/           # Whisper model storage
-├── logs/             # Application logs
-└── configs/          # Configuration files
-```
-
-## 🎯 Usage Examples
-
-### Python API Client
-```python
-import requests
-
-# Upload file
-files = {'file': open('audio.wav', 'rb')}
-response = requests.post('http://localhost:8000/upload', files=files)
-file_id = response.json()['file_id']
-
-# Start transcription
-transcription_request = {
-    "model_size": "base",
-    "language": "tr",
-    "apply_vad": True,
-    "normalize_audio": True
-}
-response = requests.post(
-    f'http://localhost:8000/transcribe/{file_id}', 
-    json=transcription_request
-)
-task_id = response.json()['task_id']
-
-# Check status
-response = requests.get(f'http://localhost:8000/task/{task_id}')
-print(response.json())
-```
-
-### WebSocket Real-time Updates
-```javascript
-const ws = new WebSocket(`ws://localhost:8000/ws/${taskId}`);
-
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    console.log('Progress:', data);
-};
-```
-
-## 🔍 Features Detail
-
-### Audio Processing Pipeline
-1. **Format Validation**: Supports WAV, MP3, MP4, WEBM, M4A
-2. **VAD Processing**: Removes silence for faster processing
-3. **Audio Normalization**: Optimizes volume levels
-4. **Whisper Transcription**: Multi-model support with language detection
-
-### Real-time Progress Tracking
-- WebSocket-based live updates
-- Stage-by-stage progress reporting  
-- Error handling and retry mechanisms
-- Connection management for multiple clients
-
-### YouTube Integration
-- Direct URL processing
-- Format selection (audio quality)
-- Background download with progress
-- Automatic transcription trigger
-
-## 🧪 Testing
-
-```bash
-# Run tests
-pytest
-
-# Test specific components
-pytest src/tests/test_transcription.py
-pytest src/tests/test_api.py
-```
-
-## 📊 Performance
-
-- **Real-time Factor**: ~0.3x (3 minutes audio → 1 minute processing)
-- **Supported File Size**: Up to 2GB
-- **Concurrent Processing**: Multiple transcription tasks
-- **Memory Usage**: ~2GB RAM for base model
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **OpenAI Whisper**: State-of-the-art speech recognition
-- **yt-dlp**: YouTube video/audio downloader
-- **FastAPI**: Modern Python web framework
-- **Next.js**: React framework for production
-- **Tailwind CSS**: Utility-first CSS framework
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Whisper](https://img.shields.io/badge/Whisper-OpenAI-412991?style=flat-square)](https://github.com/openai/whisper)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)](Dockerfile.backend)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 ---
 
-Made with ❤️ for Turkish Education Community
+## What this does
+
+A self-hosted Turkish speech-to-text service tuned for **educational content** — lectures, classroom recordings, YouTube tutorials. Built around OpenAI Whisper with audio-quality preprocessing, real-time WebSocket progress, and multi-format output (JSON / SRT / TXT).
+
+Frontend lives at [turkish-transcribe-fe](https://github.com/1lker/turkish-transcribe-fe).
+
+---
+
+## Why it exists
+
+General-purpose Turkish transcription tools choke on classroom audio: bad mics, code-switching with English technical terms, long monologues, slide-flip noise. This service ships the preprocessing + model selection that makes those usable.
+
+---
+
+## Features
+
+| Capability | Detail |
+|---|---|
+| **Turkish-optimized** | Whisper model selection + decoding params tuned for Turkish-language audio |
+| **YouTube ingest** | Direct URL → audio extract via `yt-dlp` |
+| **Real-time progress** | WebSocket stream of chunk-level transcription state |
+| **Multi-format output** | JSON, SRT subtitles, plain text |
+| **Audio preprocessing** | Voice Activity Detection (VAD) + loudness normalization |
+| **Model selection** | Tiny / Base / Small / Medium / Large — speed vs accuracy trade |
+| **Containerized** | Dockerfile + nginx reverse proxy + docker-compose |
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Ingestion
+        A[YouTube URL] --> B[yt-dlp extract]
+        C[File upload] --> D[Validation]
+        B --> E[Audio normalization]
+        D --> E
+    end
+
+    subgraph Processing
+        E --> F[VAD chunking]
+        F --> G[Whisper model]
+        G --> H[Post-processing]
+    end
+
+    subgraph Output
+        H --> I[JSON]
+        H --> J[SRT]
+        H --> K[TXT]
+    end
+
+    G -.->|progress| L[WebSocket]
+
+    style A fill:#1a1a1f,stroke:#f97316,color:#fff
+    style C fill:#1a1a1f,stroke:#f97316,color:#fff
+    style I fill:#1a1a1f,stroke:#34d399,color:#fff
+    style J fill:#1a1a1f,stroke:#34d399,color:#fff
+    style K fill:#1a1a1f,stroke:#34d399,color:#fff
+```
+
+---
+
+## Project structure
+
+```
+src/
+├── api/             # FastAPI routes + WebSocket handlers
+├── core/            # Config, logging, model loading
+├── ingestion/       # YouTube + file upload pipelines
+├── processing/      # VAD, normalization, chunking
+├── storage/         # Result persistence
+└── transcription/   # Whisper wrapper + format exporters
+```
+
+---
+
+## Quick start
+
+### Local
+
+```bash
+git clone https://github.com/1lker/turkish-transcribe-be.git
+cd turkish-transcribe-be
+pip install -r requirements.txt
+
+# Run server
+python minimal_server.py
+# → http://localhost:8000
+```
+
+### Docker
+
+```bash
+docker compose up -d
+```
+
+### CLI
+
+```bash
+python cli.py --input lecture.mp4 --model medium --format srt
+```
+
+---
+
+## API
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/transcribe/file` | `POST` | Upload audio/video for transcription |
+| `/transcribe/youtube` | `POST` | Transcribe from YouTube URL |
+| `/ws/progress/{job_id}` | `WS` | Real-time progress stream |
+| `/results/{job_id}` | `GET` | Fetch finished transcript |
+| `/health` | `GET` | Service health check |
+
+---
+
+## Tech stack
+
+- **Server:** FastAPI + Uvicorn + WebSockets
+- **Reverse proxy:** Nginx
+- **ASR:** OpenAI Whisper (`tiny` → `large`)
+- **Audio:** ffmpeg, librosa, webrtcvad
+- **Ingest:** yt-dlp
+- **Container:** Docker + docker-compose
+
+---
+
+## Author
+
+**İlker Yörü** — CTO @ [Mindra](https://mindra.co)
+[GitHub](https://github.com/1lker) · [LinkedIn](https://linkedin.com/in/ilker-yoru) · [ilkeryoru.com](https://ilkeryoru.com)
+
+## License
+
+MIT
